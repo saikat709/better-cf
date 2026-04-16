@@ -1,0 +1,29 @@
+:root {
+  font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  color: #0f172a;
+  background: #f1f5f9;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: linear-gradient(160deg, rgba(14, 116, 144, 0.08), transparent 40%),
+    radial-gradient(circle at 10% 10%, rgba(249, 115, 22, 0.08), transparent 45%),
+    #f8fafc;
+}
+
+#root {
+  min-height: 100vh;
+}
