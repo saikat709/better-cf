@@ -270,6 +270,15 @@ function ContentApp() {
           setActiveFileId(starter.id);
         }
       } catch (error) {
+        if (cancelled) return;
+        const fallback = DEFAULT_SETTINGS;
+        setSettings(fallback);
+        setIsAllowed(isSiteAllowed(window.location.hostname, fallback.sites));
+        if (files.length === 0) {
+          const starter = makeFile(fallback.defaultLanguage, 1, fallback.templates);
+          setFiles([starter]);
+          setActiveFileId(starter.id);
+        }
         setOutput(`Storage error: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
         if (!cancelled) setHydrated(true);
@@ -284,10 +293,15 @@ function ContentApp() {
 
   useEffect(() => {
     const handleSettingsChange = () => {
-      void loadSettings().then((next) => {
-        setSettings(next);
-        setIsAllowed(isSiteAllowed(window.location.hostname, next.sites));
-      });
+      void loadSettings()
+        .then((next) => {
+          setSettings(next);
+          setIsAllowed(isSiteAllowed(window.location.hostname, next.sites));
+        })
+        .catch(() => {
+          setSettings(DEFAULT_SETTINGS);
+          setIsAllowed(isSiteAllowed(window.location.hostname, DEFAULT_SETTINGS.sites));
+        });
     };
 
     browser.storage.onChanged.addListener(handleSettingsChange);
