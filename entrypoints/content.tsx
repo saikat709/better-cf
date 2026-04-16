@@ -1,17 +1,35 @@
+import '@/assets/content.css';
+import contentCssText from '@/assets/content.css?inline';
+
+import 'monaco-editor/esm/vs/language/json/monaco.contribution';
+import 'monaco-editor/esm/vs/language/css/monaco.contribution';
+import 'monaco-editor/esm/vs/language/html/monaco.contribution';
+import 'monaco-editor/esm/vs/language/typescript/monaco.contribution';
+import 'monaco-editor/esm/vs/basic-languages/python/python.contribution';
+import 'monaco-editor/esm/vs/basic-languages/cpp/cpp.contribution';
+import 'monaco-editor/esm/vs/basic-languages/java/java.contribution';
+
+import monacoCssText  from 'monaco-editor/min/vs/editor/editor.main.css?inline';
+import editorWorker   from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import jsonWorker     from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import cssWorker      from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import htmlWorker     from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import tsWorker       from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import ReactDOM from 'react-dom/client';
 import type { editor } from 'monaco-editor';
 import { Code, FilePlus2, Maximize2, Minimize2, Play, Redo2, Undo2, X } from 'lucide-react';
-import '@/assets/content.css';
-import contentCssText from '@/assets/content.css?inline';
-import monacoCssText from 'monaco-editor/min/vs/editor/editor.main.css?inline';
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
-import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-type Language = 'javascript' | 'typescript' | 'python' | 'json' | 'html' | 'css';
+import {
+  DEFAULT_SETTINGS,
+  DEFAULT_SNIPPETS,
+  LANGUAGE_META,
+  loadSettings,
+  isSiteAllowed,
+  type Language,
+  type Settings,
+} from './shared/settings';
 
 type CodeFile = {
   id: string;
@@ -27,28 +45,19 @@ type PersistedState = {
   input: string;
 };
 
+type EditorToggleDetail = {
+  open?: boolean;
+};
+
 const DB_NAME = 'better-cp-editor';
 const DB_VERSION = 1;
 const FILE_STORE = 'files';
 const META_STORE = 'meta';
+const TOGGLE_EVENT = 'better-cp:toggle-editor';
+const STATUS_MESSAGE = 'better-cp:get-editor-status';
 
-const LANGUAGE_META: Record<Language, { label: string; ext: string }> = {
-  javascript: { label: 'JavaScript', ext: 'js' },
-  typescript: { label: 'TypeScript', ext: 'ts' },
-  python: { label: 'Python', ext: 'py' },
-  json: { label: 'JSON', ext: 'json' },
-  html: { label: 'HTML', ext: 'html' },
-  css: { label: 'CSS', ext: 'css' },
-};
-
-const DEFAULT_SNIPPETS: Record<Language, string> = {
-  javascript: `function main(input) {\n  console.log('Input:', input);\n  return 'JS executed';\n}\n\nmain(input);`,
-  typescript: `type UserInput = string;\n\nfunction main(input: UserInput): string {\n  return \`TS says: \${input}\`;\n}\n\nmain(input as UserInput);`,
-  python: `def main(user_input):\n    print("Input:", user_input)\n    return "Python template"\n`,
-  json: `{\n  "name": "better-cp",\n  "enabled": true,\n  "tags": ["extension", "editor"]\n}`,
-  html: `<!doctype html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <title>better-cp</title>\n  </head>\n  <body>\n    <h1>Hello from better-cp</h1>\n  </body>\n</html>`,
-  css: `:root {\n  color-scheme: dark;\n}\n\nbody {\n  margin: 0;\n  font-family: system-ui, sans-serif;\n}`,
-};
+let latestOpenState = false;
+let latestAllowedState = true;
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -118,11 +127,11 @@ const saveState = async (files: CodeFile[], activeFileId: string, input: string)
   db.close();
 };
 
-const makeFile = (language: Language, index: number): CodeFile => ({
+const makeFile = (language: Language, index: number, templates: Record<Language, string>): CodeFile => ({
   id: crypto.randomUUID(),
   name: `file-${index}.${LANGUAGE_META[language].ext}`,
   language,
-  content: DEFAULT_SNIPPETS[language],
+  content: templates[language] ?? DEFAULT_SNIPPETS[language],
   updatedAt: Date.now(),
 });
 
@@ -211,28 +220,55 @@ function MonacoPane({ value, language, onChange, onMount }: MonacoPaneProps) {
 
 function ContentApp() {
   const [isOpen, setIsOpen] = useState(false);
-  const [files, setFiles] = useState<CodeFile[]>([makeFile('javascript', 1)]);
-  const [activeFileId, setActiveFileId] = useState(files[0].id);
+  const [files, setFiles] = useState<CodeFile[]>([]);
+  const [activeFileId, setActiveFileId] = useState('');
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('No output yet');
   const [hydrated, setHydrated] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(560);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [isAllowed, setIsAllowed] = useState(() => isSiteAllowed(window.location.hostname, DEFAULT_SETTINGS.sites));
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const dragState = useRef<{ startX: number; startWidth: number } | null>(null);
 
   const activeFile = useMemo(() => files.find((file) => file.id === activeFileId) ?? files[0], [files, activeFileId]);
 
   useEffect(() => {
+    const handleToggle = (event: Event) => {
+      const { detail } = event as CustomEvent<EditorToggleDetail>;
+      setIsOpen((prev) => (typeof detail?.open === 'boolean' ? detail.open : !prev));
+    };
+
+    window.addEventListener(TOGGLE_EVENT, handleToggle as EventListener);
+    return () => window.removeEventListener(TOGGLE_EVENT, handleToggle as EventListener);
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     const hydrate = async () => {
       try {
+        const nextSettings = await loadSettings();
+        if (cancelled) return;
+        setSettings(nextSettings);
+        setIsAllowed(isSiteAllowed(window.location.hostname, nextSettings.sites));
+
         const { files: storedFiles, meta } = await loadState();
-        if (cancelled || storedFiles.length === 0) return;
-        setFiles(storedFiles);
-        setActiveFileId(meta?.activeFileId && storedFiles.some((file) => file.id === meta.activeFileId) ? meta.activeFileId : storedFiles[0].id);
-        setInput(meta?.input ?? '');
-        setOutput('Loaded saved workspace');
+        if (cancelled) return;
+        if (storedFiles.length > 0) {
+          setFiles(storedFiles);
+          setActiveFileId(
+            meta?.activeFileId && storedFiles.some((file) => file.id === meta.activeFileId)
+              ? meta.activeFileId
+              : storedFiles[0].id,
+          );
+          setInput(meta?.input ?? '');
+          setOutput('Loaded saved workspace');
+        } else {
+          const starter = makeFile(nextSettings.defaultLanguage, 1, nextSettings.templates);
+          setFiles([starter]);
+          setActiveFileId(starter.id);
+        }
       } catch (error) {
         setOutput(`Storage error: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
@@ -245,6 +281,30 @@ function ContentApp() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      void loadSettings().then((next) => {
+        setSettings(next);
+        setIsAllowed(isSiteAllowed(window.location.hostname, next.sites));
+      });
+    };
+
+    browser.storage.onChanged.addListener(handleSettingsChange);
+    return () => browser.storage.onChanged.removeListener(handleSettingsChange);
+  }, []);
+
+  useEffect(() => {
+    if (!isAllowed) setIsOpen(false);
+  }, [isAllowed]);
+
+  useEffect(() => {
+    latestOpenState = isOpen;
+  }, [isOpen]);
+
+  useEffect(() => {
+    latestAllowedState = isAllowed;
+  }, [isAllowed]);
 
   useEffect(() => {
     if (!hydrated || files.length === 0 || !activeFile) return;
@@ -280,7 +340,7 @@ function ContentApp() {
   const redo = () => editorRef.current?.trigger('better-cp', 'redo', null);
 
   const addFile = () => {
-    const next = makeFile(activeFile?.language ?? 'javascript', files.length + 1);
+    const next = makeFile(settings.defaultLanguage, files.length + 1, settings.templates);
     setFiles((prev) => [...prev, next]);
     setActiveFileId(next.id);
   };
@@ -348,6 +408,10 @@ function ContentApp() {
     fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
   };
 
+  if (!isAllowed || !activeFile) {
+    return null;
+  }
+
   return (
     <div id="better-cp-ui-root">
       <div
@@ -366,10 +430,10 @@ function ContentApp() {
         <Code size={22} />
       </div>
 
-      {isOpen && activeFile && (
+      {isOpen && (
         <aside
           style={sidebarStyle}
-          className="relative flex h-screen flex-col border-l border-slate-700 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 shadow-2xl"
+          className="relative flex h-screen flex-col border-l border-slate-700 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 shadow-2xl"
         >
           <div
             role="separator"
@@ -444,14 +508,14 @@ function ContentApp() {
               value={activeFile.language}
               onChange={(event) => {
                 const language = event.target.value as Language;
+                const previousTemplate = settings.templates[activeFile.language] ?? DEFAULT_SNIPPETS[activeFile.language];
+                const nextTemplate = settings.templates[language] ?? DEFAULT_SNIPPETS[language];
                 updateActiveFile((file) => ({
                   ...file,
                   language,
                   name: ensureExtension(file.name, language),
                   content:
-                    file.content.trim().length === 0 || file.content === DEFAULT_SNIPPETS[file.language]
-                      ? DEFAULT_SNIPPETS[language]
-                      : file.content,
+                    file.content.trim().length === 0 || file.content === previousTemplate ? nextTemplate : file.content,
                   updatedAt: Date.now(),
                 }));
               }}
@@ -556,11 +620,16 @@ export default defineContentScript({
     host.style.all = 'initial';
     document.documentElement.append(host);
 
-    const shadow = host.attachShadow({ mode: 'open' });
+    const shadow = host.attachShadow({
+      mode: 'open' 
+    });
+    
     const baseStyle = document.createElement('style');
     baseStyle.textContent = `
       :host { all: initial; }
-      #better-cp-ui-root, #better-cp-ui-root * { box-sizing: border-box; }
+      #better-cp-ui-root, #better-cp-ui-root * {
+        box-sizing: border-box;
+      }
       #better-cp-ui-root {
         font-size: 15px !important;
         line-height: 1.4 !important;
@@ -587,7 +656,35 @@ export default defineContentScript({
     const root = ReactDOM.createRoot(container);
     root.render(<ContentApp />);
 
+    const onRuntimeMessage = async (message: unknown) => {
+      if (!message || typeof message !== 'object') return;
+      const payload = message as { type?: string; open?: boolean };
+
+      if (payload.type === STATUS_MESSAGE) {
+        return { ok: true, isOpen: latestOpenState, allowed: latestAllowedState };
+      }
+
+      if (payload.type !== TOGGLE_EVENT) return;
+
+      if (!latestAllowedState) {
+        return { ok: false, isOpen: false, message: 'Editor is disabled for this site.' };
+      }
+
+      const nextOpen = typeof payload.open === 'boolean' ? payload.open : !latestOpenState;
+      latestOpenState = nextOpen;
+
+      window.dispatchEvent(
+        new CustomEvent<EditorToggleDetail>(TOGGLE_EVENT, {
+          detail: { open: nextOpen },
+        }),
+      );
+      return { ok: true, isOpen: nextOpen };
+    };
+
+    browser.runtime.onMessage.addListener(onRuntimeMessage);
+
     ctx.onInvalidated(() => {
+      browser.runtime.onMessage.removeListener(onRuntimeMessage);
       root.unmount();
       host.remove();
     });
