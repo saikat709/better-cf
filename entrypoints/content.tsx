@@ -25,6 +25,7 @@ import {
   DEFAULT_SETTINGS,
   DEFAULT_SNIPPETS,
   LANGUAGE_META,
+  getStorageApi,
   loadSettings,
   isSiteAllowed,
   type Language,
@@ -249,6 +250,7 @@ function ContentApp() {
     const hydrate = async () => {
       try {
         const nextSettings = await loadSettings();
+        console.log('Loaded settings:', nextSettings);
         if (cancelled) return;
         setSettings(nextSettings);
         setIsAllowed(isSiteAllowed(window.location.hostname, nextSettings.sites));
@@ -304,8 +306,10 @@ function ContentApp() {
         });
     };
 
-    browser.storage.onChanged.addListener(handleSettingsChange);
-    return () => browser.storage.onChanged.removeListener(handleSettingsChange);
+    const storage = getStorageApi();
+    if (!storage?.onChanged) return;
+    storage.onChanged.addListener(handleSettingsChange);
+    return () => storage.onChanged.removeListener(handleSettingsChange);
   }, []);
 
   useEffect(() => {

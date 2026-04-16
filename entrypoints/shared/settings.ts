@@ -51,6 +51,14 @@ export const DEFAULT_SETTINGS: Settings = {
 
 const SETTINGS_KEY = 'better-cp:settings';
 
+const getExtensionApi = () => {
+  const api = (globalThis as typeof globalThis & { browser?: typeof browser; chrome?: typeof chrome }).browser ??
+    (globalThis as typeof globalThis & { browser?: typeof browser; chrome?: typeof chrome }).chrome;
+  return api ?? null;
+};
+
+export const getStorageApi = () => getExtensionApi()?.storage ?? null;
+
 export const normalizeSiteInput = (value: string): string => {
   const trimmed = value.trim().toLowerCase();
   if (!trimmed) return '';
@@ -78,7 +86,9 @@ export const isSiteAllowed = (host: string, sites: SiteEntry[]): boolean => {
 };
 
 export const loadSettings = async (): Promise<Settings> => {
-  const stored = (await browser.storage.local.get(SETTINGS_KEY))[SETTINGS_KEY] as Settings | undefined;
+  const storage = getStorageApi()?.local;
+  if (!storage) return DEFAULT_SETTINGS;
+  const stored = (await storage.get(SETTINGS_KEY))[SETTINGS_KEY] as Settings | undefined;
   if (!stored) return DEFAULT_SETTINGS;
   return {
     ...DEFAULT_SETTINGS,
@@ -89,5 +99,7 @@ export const loadSettings = async (): Promise<Settings> => {
 };
 
 export const saveSettings = async (next: Settings): Promise<void> => {
-  await browser.storage.local.set({ [SETTINGS_KEY]: next });
+  const storage = getStorageApi()?.local;
+  if (!storage) return;
+  await storage.set({ [SETTINGS_KEY]: next });
 };
