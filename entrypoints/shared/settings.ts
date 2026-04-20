@@ -51,13 +51,31 @@ export const DEFAULT_SETTINGS: Settings = {
 
 const SETTINGS_KEY = 'better-cp:settings';
 
+type ExtensionApi = typeof globalThis & { browser?: unknown; chrome?: unknown };
+
 const getExtensionApi = () => {
-  const api = (globalThis as typeof globalThis & { browser?: typeof browser; chrome?: typeof chrome }).browser ??
-    (globalThis as typeof globalThis & { browser?: typeof browser; chrome?: typeof chrome }).chrome;
+  const root = globalThis as ExtensionApi;
+  const api = root.browser ?? root.chrome;
   return api ?? null;
 };
 
-export const getStorageApi = () => getExtensionApi()?.storage ?? null;
+type StorageApi = {
+  local?: {
+    get: (key: string) => Promise<Record<string, unknown>>;
+    set: (items: Record<string, unknown>) => Promise<void>;
+  };
+  onChanged?: {
+    addListener: (handler: () => void) => void;
+    removeListener: (handler: () => void) => void;
+  };
+};
+
+export const getStorageApi = (): StorageApi | null => {
+  const api = getExtensionApi();
+  if (!api || typeof api !== 'object') return null;
+  const storage = (api as { storage?: StorageApi }).storage;
+  return storage ?? null;
+};
 
 export const normalizeSiteInput = (value: string): string => {
   const trimmed = value.trim().toLowerCase();
