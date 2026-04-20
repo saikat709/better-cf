@@ -1,4 +1,4 @@
-import type { Language } from '../entrypoints/shared/settings';
+import type { Language } from '../src/shared/settings';
 
 type PistonRuntime = {
   language: string;
