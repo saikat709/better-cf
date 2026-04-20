@@ -34,7 +34,7 @@ self.MonacoEnvironment = {
 
 export default defineContentScript({
   matches: ['<all_urls>'],
-  cssInjectionMode: 'manifest',
+  cssInjectionMode: 'manual',
   async main(ctx) {
     const host = document.createElement('div');
     host.id = 'better-cp-root';
@@ -67,12 +67,12 @@ export default defineContentScript({
       }
       #better-cp-ui-root .bcp-title { font-size: 16px !important; }
     `;
-    const stylesheet = document.createElement('style');
-    stylesheet.textContent = contentCssText;
+    const contentStylesheet = document.createElement('style');
+    contentStylesheet.textContent = contentCssText;
     const monacoStylesheet = document.createElement('style');
     monacoStylesheet.textContent = monacoCssText;
     const container = document.createElement('div');
-    shadow.append(baseStyle, stylesheet, monacoStylesheet, container);
+    shadow.append(baseStyle, contentStylesheet, monacoStylesheet, container);
 
     const root = ReactDOM.createRoot(container);
     root.render(<ContentApp />);

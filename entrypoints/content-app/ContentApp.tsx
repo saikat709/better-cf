@@ -283,7 +283,7 @@ function ContentApp() {
           <motion.aside
             key="better-cp-sidebar"
             style={sidebarStyle}
-            className="relative flex h-screen flex-col border-l border-slate-700 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 shadow-2xl"
+            className="relative flex h-screen flex-col border-l border-slate-700 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 shadow-2xl bg-gray-950/95 backdrop-blur-lg"
             initial={{ x: 24, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 24, opacity: 0 }}
