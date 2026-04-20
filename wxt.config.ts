@@ -5,8 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    name: 'better-cp',
-    description: 'Floating Monaco sidebar for in-page coding',
+    name: 'BetterCF',
+    description: 'Make codeforces better again.',
+    host_permissions: ['https://emkc.org/*'],
     browser_specific_settings: {
       gecko: {
         data_collection_permissions: {
