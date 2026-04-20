@@ -1,6 +1,6 @@
 {
-  "name": "better-cp",
-  "description": "better-cp browser extension",
+  "name": "better-cf",
+  "description": "better-cf is a browser extension that enhances the Codeforces experience by providing a floating Monaco editor sidebar for in-page coding. It allows users to write, test, and submit code directly from the Codeforces website, streamlining the competitive programming workflow.",
   "private": true,
   "version": "0.0.0",
   "type": "module",
