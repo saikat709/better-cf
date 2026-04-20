@@ -16,10 +16,11 @@ import cssWorker      from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import htmlWorker     from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker       from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import ReactDOM from 'react-dom/client';
 import type { editor } from 'monaco-editor';
 import { Code, FilePlus2, Maximize2, Minimize2, Play, Redo2, Undo2, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import {
   DEFAULT_SETTINGS,
@@ -432,199 +433,213 @@ function ContentApp() {
 
   return (
     <div id="better-cp-ui-root">
-      <div
+      <motion.div
         role="button"
         tabIndex={0}
         style={launcherStyle}
         onClick={() => setIsOpen((value) => !value)}
-        onKeyDown={(event) => {
+        onKeyDown={(event: ReactKeyboardEvent<HTMLDivElement>) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             setIsOpen((value) => !value);
           }
         }}
         aria-label="Toggle better-cp editor"
+        initial={{ scale: 0.96, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.98 }}
       >
         <Code size={22} />
-      </div>
+      </motion.div>
 
-      {isOpen && (
-        <aside
-          style={sidebarStyle}
-          className="relative flex h-screen flex-col border-l border-slate-700 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 shadow-2xl"
-        >
-          <div
-            role="separator"
-            aria-orientation="vertical"
-            aria-label="Resize editor width"
-            className="absolute bottom-0 left-0 top-0 z-20 w-3 cursor-ew-resize bg-transparent hover:bg-indigo-500/15"
-            onPointerDown={(event) => {
-              dragState.current = {
-                startX: event.clientX,
-                startWidth: isExpanded ? window.innerWidth : sidebarWidth,
-              };
-              setIsExpanded(false);
-            }}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.aside
+            key="better-cp-sidebar"
+            style={sidebarStyle}
+            className="relative flex h-screen flex-col border-l border-slate-700 bg-linear-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 shadow-2xl"
+            initial={{ x: 24, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 24, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 28 }}
           >
-            <div className="pointer-events-none absolute left-1/2 top-1/2 h-16 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-500/70" />
-          </div>
-          <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-            <div className="bcp-title text-sm font-semibold tracking-wide">better-cp editor</div>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                className="rounded-md p-1 text-slate-300 hover:bg-slate-800 hover:text-white"
-                onClick={() => setIsExpanded((value) => !value)}
-                aria-label={isExpanded ? 'Restore sidebar width' : 'Expand sidebar'}
-                title={isExpanded ? 'Restore width' : 'Expand'}
-              >
-                {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </button>
-              <button
-                type="button"
-                className="rounded-md p-1 text-slate-300 hover:bg-slate-800 hover:text-white"
-                onClick={() => setIsOpen(false)}
-                aria-label="Close sidebar"
-              >
-                <X size={18} />
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 border-b border-slate-800 px-4 py-3">
-            <button
-              type="button"
-              className="rounded-md bg-emerald-600 p-2 text-white hover:bg-emerald-500"
-              style={{ backgroundColor: '#16a34a', color: '#ffffff' }}
-              onClick={runCode}
-              aria-label="Run code"
-              title="Run"
-            >
-              <Play size={15} />
-            </button>
-            <button
-              type="button"
-              className="rounded-md bg-slate-800 p-2 text-slate-100 hover:bg-slate-700"
-              style={{ backgroundColor: '#1e293b', color: '#f8fafc' }}
-              onClick={undo}
-              aria-label="Undo"
-              title="Undo"
-            >
-              <Undo2 size={15} />
-            </button>
-            <button
-              type="button"
-              className="rounded-md bg-slate-800 p-2 text-slate-100 hover:bg-slate-700"
-              style={{ backgroundColor: '#1e293b', color: '#f8fafc' }}
-              onClick={redo}
-              aria-label="Redo"
-              title="Redo"
-            >
-              <Redo2 size={15} />
-            </button>
-            <select
-              value={activeFile.language}
-              onChange={(event) => {
-                const language = event.target.value as Language;
-                const previousTemplate = settings.templates[activeFile.language] ?? DEFAULT_SNIPPETS[activeFile.language];
-                const nextTemplate = settings.templates[language] ?? DEFAULT_SNIPPETS[language];
-                updateActiveFile((file) => ({
-                  ...file,
-                  language,
-                  name: ensureExtension(file.name, language),
-                  content:
-                    file.content.trim().length === 0 || file.content === previousTemplate ? nextTemplate : file.content,
-                  updatedAt: Date.now(),
-                }));
+            <div
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize editor width"
+              className="absolute bottom-0 left-0 top-0 z-20 w-3 cursor-ew-resize bg-transparent hover:bg-indigo-500/15"
+              onPointerDown={(event) => {
+                dragState.current = {
+                  startX: event.clientX,
+                  startWidth: isExpanded ? window.innerWidth : sidebarWidth,
+                };
+                setIsExpanded(false);
               }}
-              className="ml-auto rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200 outline-none focus:border-indigo-400"
-              style={{ fontSize: '14px' }}
-              aria-label="Language selector"
             >
-              {(Object.keys(LANGUAGE_META) as Language[]).map((language) => (
-                <option key={language} value={language}>
-                  {LANGUAGE_META[language].label}
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              className="rounded-md bg-slate-800 p-2 text-slate-100 hover:bg-slate-700"
-              style={{ backgroundColor: '#1e293b', color: '#f8fafc' }}
-              onClick={addFile}
-              aria-label="Add file"
-              title="Add file"
-            >
-              <FilePlus2 size={15} />
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto border-b border-slate-800 px-3 py-2">
-            {files.map((file) => (
-              <div
-                key={file.id}
-                className={`flex items-center gap-2 rounded-md border px-2 py-1 text-xs ${
-                  file.id === activeFile.id
-                    ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200'
-                    : 'border-slate-700 bg-slate-900 text-slate-300'
-                }`}
-                style={{ fontSize: '13px' }}
-              >
+              <div className="pointer-events-none absolute left-1/2 top-1/2 h-16 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-500/70" />
+            </div>
+            <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
+              <div className="bcp-title text-sm font-semibold tracking-wide">better-cp editor</div>
+              <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className="whitespace-nowrap"
-                  onClick={() => setActiveFileId(file.id)}
-                  title={file.name}
+                  className="rounded-md p-1 text-slate-300 hover:bg-slate-800 hover:text-white"
+                  onClick={() => setIsExpanded((value) => !value)}
+                  aria-label={isExpanded ? 'Restore sidebar width' : 'Expand sidebar'}
+                  title={isExpanded ? 'Restore width' : 'Expand'}
                 >
-                  {file.name}
+                  {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                 </button>
-                {files.length > 1 && (
+                <button
+                  type="button"
+                  className="rounded-md p-1 text-slate-300 hover:bg-slate-800 hover:text-white"
+                  onClick={() => setIsOpen(false)}
+                  aria-label="Close sidebar"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 border-b border-slate-800 px-4 py-3">
+              <button
+                type="button"
+                className="rounded-md bg-emerald-600 p-2 text-white hover:bg-emerald-500"
+                style={{ backgroundColor: '#16a34a', color: '#ffffff' }}
+                onClick={runCode}
+                aria-label="Run code"
+                title="Run"
+              >
+                <Play size={15} />
+              </button>
+              <button
+                type="button"
+                className="rounded-md bg-slate-800 p-2 text-slate-100 hover:bg-slate-700"
+                style={{ backgroundColor: '#1e293b', color: '#f8fafc' }}
+                onClick={undo}
+                aria-label="Undo"
+                title="Undo"
+              >
+                <Undo2 size={15} />
+              </button>
+              <button
+                type="button"
+                className="rounded-md bg-slate-800 p-2 text-slate-100 hover:bg-slate-700"
+                style={{ backgroundColor: '#1e293b', color: '#f8fafc' }}
+                onClick={redo}
+                aria-label="Redo"
+                title="Redo"
+              >
+                <Redo2 size={15} />
+              </button>
+              <select
+                value={activeFile.language}
+                onChange={(event) => {
+                  const language = event.target.value as Language;
+                  const previousTemplate = settings.templates[activeFile.language] ?? DEFAULT_SNIPPETS[activeFile.language];
+                  const nextTemplate = settings.templates[language] ?? DEFAULT_SNIPPETS[language];
+                  updateActiveFile((file) => ({
+                    ...file,
+                    language,
+                    name: ensureExtension(file.name, language),
+                    content:
+                      file.content.trim().length === 0 || file.content === previousTemplate ? nextTemplate : file.content,
+                    updatedAt: Date.now(),
+                  }));
+                }}
+                className="ml-auto rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200 outline-none focus:border-indigo-400"
+                style={{ fontSize: '14px' }}
+                aria-label="Language selector"
+              >
+                {(Object.keys(LANGUAGE_META) as Language[]).map((language) => (
+                  <option key={language} value={language}>
+                    {LANGUAGE_META[language].label}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="rounded-md bg-slate-800 p-2 text-slate-100 hover:bg-slate-700"
+                style={{ backgroundColor: '#1e293b', color: '#f8fafc' }}
+                onClick={addFile}
+                aria-label="Add file"
+                title="Add file"
+              >
+                <FilePlus2 size={15} />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto border-b border-slate-800 px-3 py-2">
+              {files.map((file) => (
+                <div
+                  key={file.id}
+                  className={`flex items-center gap-2 rounded-md border px-2 py-1 text-xs ${
+                    file.id === activeFile.id
+                      ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200'
+                      : 'border-slate-700 bg-slate-900 text-slate-300'
+                  }`}
+                  style={{ fontSize: '13px' }}
+                >
                   <button
                     type="button"
-                    className="text-slate-400 hover:text-red-300"
-                    onClick={() => removeFile(file.id)}
-                    aria-label={`Close ${file.name}`}
+                    className="whitespace-nowrap"
+                    onClick={() => setActiveFileId(file.id)}
+                    title={file.name}
                   >
-                    ×
+                    {file.name}
                   </button>
-                )}
-              </div>
-            ))}
-          </div>
+                  {files.length > 1 && (
+                    <button
+                      type="button"
+                      className="text-slate-400 hover:text-red-300"
+                      onClick={() => removeFile(file.id)}
+                      aria-label={`Close ${file.name}`}
+                    >
+                      x
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
 
-          <div className="flex-1 overflow-hidden p-0">
-            <MonacoPane
-              value={activeFile.content}
-              language={activeFile.language}
-              onMount={(instance) => {
-                editorRef.current = instance;
-              }}
-              onChange={(content) => {
-                updateActiveFile((file) => ({ ...file, content, updatedAt: Date.now() }));
-              }}
-            />
-          </div>
-
-          <div className="space-y-3 border-t border-slate-800 px-4 py-3">
-            <div>
-              <label htmlFor="better-cp-input" className="mb-1 block text-xs font-medium text-slate-300">
-                Input
-              </label>
-              <textarea
-                id="better-cp-input"
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                className="h-20 w-full resize-none rounded-md border border-slate-700 bg-slate-900 p-2 text-sm text-slate-100 outline-none focus:border-indigo-400"
-                placeholder="Passed as input variable when running JS/TS"
+            <div className="flex-1 overflow-hidden p-0">
+              <MonacoPane
+                value={activeFile.content}
+                language={activeFile.language}
+                onMount={(instance) => {
+                  editorRef.current = instance;
+                }}
+                onChange={(content) => {
+                  updateActiveFile((file) => ({ ...file, content, updatedAt: Date.now() }));
+                }}
               />
             </div>
-            <div className="rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-200" style={{ fontSize: '14px' }}>
-              <span className="text-slate-400">Output: </span>
-              {output}
+
+            <div className="space-y-3 border-t border-slate-800 px-4 py-3">
+              <div>
+                <label htmlFor="better-cp-input" className="mb-1 block text-xs font-medium text-slate-300">
+                  Input
+                </label>
+                <textarea
+                  id="better-cp-input"
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  className="h-20 w-full resize-none rounded-md border border-slate-700 bg-slate-900 p-2 text-sm text-slate-100 outline-none focus:border-indigo-400"
+                  placeholder="Passed as input variable when running JS/TS"
+                />
+              </div>
+              <div
+                className="rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-200"
+                style={{ fontSize: '14px' }}
+              >
+                <span className="text-slate-400">Output: </span>
+                {output}
+              </div>
             </div>
-          </div>
-        </aside>
-      )}
+          </motion.aside>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
