@@ -20,5 +20,12 @@ export default defineConfig({
   webExt: { disabled: true },
   vite: () => ({
     plugins: [tailwindcss()],
+    build: {
+      rolldownOptions: {
+        checks: {
+          pluginTimings: false,
+        },
+      },
+    },
   }),
 });
