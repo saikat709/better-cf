@@ -39,9 +39,22 @@ const LANGUAGE_TARGETS: Record<Language, { language: string; prefer: string[]; a
   c: { language: 'C', prefer: ['gcc-'], avoid: ['head'] },
   cpp: { language: 'C++', prefer: ['gcc-'], avoid: ['head'] },
   java: { language: 'Java', prefer: ['openjdk-'] },
-  python: { language: 'Python', prefer: ['cpython-'] },
+  kotlin: { language: 'Kotlin', prefer: ['kotlin-', 'kotlinc-'] },
+  python: { language: 'Python', prefer: ['cpython-'], avoid: ['pypy-'] },
+  pypy: { language: 'Python', prefer: ['pypy-'] },
   javascript: { language: 'JavaScript', prefer: ['nodejs-'] },
   typescript: { language: 'TypeScript', prefer: ['typescript-'] },
+  rust: { language: 'Rust', prefer: ['rust-'] },
+  go: { language: 'Go', prefer: ['go-'] },
+  csharp: { language: 'C#', prefer: ['dotnetcore-', 'mono-'] },
+  ruby: { language: 'Ruby', prefer: ['ruby-'], avoid: ['mruby-'] },
+  php: { language: 'PHP', prefer: ['php-'] },
+  swift: { language: 'Swift', prefer: ['swift-'] },
+  scala: { language: 'Scala', prefer: ['scala-'] },
+  haskell: { language: 'Haskell', prefer: ['ghc-'] },
+  ocaml: { language: 'OCaml', prefer: ['ocaml-'] },
+  d: { language: 'D', prefer: ['ldc-', 'dmd-', 'gdc-'] },
+  lua: { language: 'Lua', prefer: ['lua-'], avoid: ['luajit-'] },
 };
 
 let compilerPromise: Promise<Map<Language, WandboxCompiler>> | null = null;

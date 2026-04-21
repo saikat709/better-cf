@@ -1,4 +1,23 @@
-export type Language = 'javascript' | 'typescript' | 'python' | 'c' | 'cpp' | 'java';
+export type Language =
+  | 'c'
+  | 'cpp'
+  | 'java'
+  | 'kotlin'
+  | 'python'
+  | 'pypy'
+  | 'javascript'
+  | 'typescript'
+  | 'rust'
+  | 'go'
+  | 'csharp'
+  | 'ruby'
+  | 'php'
+  | 'swift'
+  | 'scala'
+  | 'haskell'
+  | 'ocaml'
+  | 'd'
+  | 'lua';
 
 export type SiteEntry = {
   id: string;
@@ -17,18 +36,44 @@ export const LANGUAGE_META: Record<Language, { label: string; ext: string }> = {
   c: { label: 'C', ext: 'c' },
   cpp: { label: 'C++', ext: 'cpp' },
   java: { label: 'Java', ext: 'java' },
+  kotlin: { label: 'Kotlin', ext: 'kt' },
   javascript: { label: 'JavaScript', ext: 'js' },
   typescript: { label: 'TypeScript', ext: 'ts' },
   python: { label: 'Python', ext: 'py' },
+  pypy: { label: 'PyPy', ext: 'py' },
+  rust: { label: 'Rust', ext: 'rs' },
+  go: { label: 'Go', ext: 'go' },
+  csharp: { label: 'C#', ext: 'cs' },
+  ruby: { label: 'Ruby', ext: 'rb' },
+  php: { label: 'PHP', ext: 'php' },
+  swift: { label: 'Swift', ext: 'swift' },
+  scala: { label: 'Scala', ext: 'scala' },
+  haskell: { label: 'Haskell', ext: 'hs' },
+  ocaml: { label: 'OCaml', ext: 'ml' },
+  d: { label: 'D', ext: 'd' },
+  lua: { label: 'Lua', ext: 'lua' },
 };
 
 export const DEFAULT_SNIPPETS: Record<Language, string> = {
   c: `#include <stdio.h>\n\nint main() {\n    printf("Hello, better-cp!\\n");\n    return 0;\n}\n`,
   cpp: `#include <iostream>\n\nint main() {\n    std::cout << "Hello, better-cp!" << std::endl;\n    return 0;\n}\n`,
   java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, better-cp!");\n    }\n}\n`,
+  kotlin: `fun main() {\n    println("Hello, better-cp!")\n}\n`,
+  python: `def main(user_input):\n    print("Input:", user_input)\n    return "Python template"\n`,
+  pypy: `def main(user_input):\n    print("Input:", user_input)\n    return "PyPy template"\n`,
   javascript: `function main(input) {\n  console.log('Input:', input);\n  return 'JS executed';\n}\n\nmain(input);`,
   typescript: `type UserInput = string;\n\nfunction main(input: UserInput): string {\n  return \`TS says: \${input}\`;\n}\n\nmain(input as UserInput);`,
-  python: `def main(user_input):\n    print("Input:", user_input)\n    return "Python template"\n`,
+  rust: `fn main() {\n    println!("Hello, better-cp!");\n}\n`,
+  go: `package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, better-cp!")\n}\n`,
+  csharp: `using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello, better-cp!");\n    }\n}\n`,
+  ruby: `puts "Hello, better-cp!"\n`,
+  php: `<?php\n\necho "Hello, better-cp!\\n";\n`,
+  swift: `import Foundation\n\nprint("Hello, better-cp!")\n`,
+  scala: `object Main extends App {\n    println("Hello, better-cp!")\n}\n`,
+  haskell: `main :: IO ()\nmain = putStrLn "Hello, better-cp!"\n`,
+  ocaml: `print_endline "Hello, better-cp!";;\n`,
+  d: `import std.stdio;\n\nvoid main() {\n    writeln("Hello, better-cp!");\n}\n`,
+  lua: `print("Hello, better-cp!")\n`,
 };
 
 export const DEFAULT_SITES: SiteEntry[] = [
