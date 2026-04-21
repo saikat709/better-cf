@@ -55,25 +55,264 @@ export const LANGUAGE_META: Record<Language, { label: string; ext: string }> = {
 };
 
 export const DEFAULT_SNIPPETS: Record<Language, string> = {
-  c: `#include <stdio.h>\n\nint main() {\n    printf("Hello, better-cp!\\n");\n    return 0;\n}\n`,
-  cpp: `#include <iostream>\n\nint main() {\n    std::cout << "Hello, better-cp!" << std::endl;\n    return 0;\n}\n`,
-  java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, better-cp!");\n    }\n}\n`,
-  kotlin: `fun main() {\n    println("Hello, better-cp!")\n}\n`,
-  python: `def main(user_input):\n    print("Input:", user_input)\n    return "Python template"\n`,
-  pypy: `def main(user_input):\n    print("Input:", user_input)\n    return "PyPy template"\n`,
-  javascript: `function main(input) {\n  console.log('Input:', input);\n  return 'JS executed';\n}\n\nmain(input);`,
-  typescript: `type UserInput = string;\n\nfunction main(input: UserInput): string {\n  return \`TS says: \${input}\`;\n}\n\nmain(input as UserInput);`,
-  rust: `fn main() {\n    println!("Hello, better-cp!");\n}\n`,
-  go: `package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, better-cp!")\n}\n`,
-  csharp: `using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello, better-cp!");\n    }\n}\n`,
-  ruby: `puts "Hello, better-cp!"\n`,
-  php: `<?php\n\necho "Hello, better-cp!\\n";\n`,
-  swift: `import Foundation\n\nprint("Hello, better-cp!")\n`,
-  scala: `object Main extends App {\n    println("Hello, better-cp!")\n}\n`,
-  haskell: `main :: IO ()\nmain = putStrLn "Hello, better-cp!"\n`,
-  ocaml: `print_endline "Hello, better-cp!";;\n`,
-  d: `import std.stdio;\n\nvoid main() {\n    writeln("Hello, better-cp!");\n}\n`,
-  lua: `print("Hello, better-cp!")\n`,
+  c: `#include <stdio.h>
+
+int main() {
+    int t;
+    scanf("%d", &t);
+    while (t--) {
+        int n;
+        scanf("%d", &n);
+        printf("%d\\n", n);
+    }
+    return 0;
+}
+`,
+
+  cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+#define fast ios::sync_with_stdio(false); cin.tie(NULL);
+
+int main() {
+    fast;
+    int t;
+    cin >> t;
+    while (t--) {
+        int n;
+        cin >> n;
+        cout << n << '\\n';
+    }
+    return 0;
+}
+`,
+
+  java: `import java.io.*;
+import java.util.*;
+
+public class Main {
+    static FastScanner fs = new FastScanner(System.in);
+    static PrintWriter out = new PrintWriter(System.out);
+
+    public static void main(String[] args) {
+        int t = fs.nextInt();
+        while (t-- > 0) {
+            int n = fs.nextInt();
+            out.println(n);
+        }
+        out.flush();
+    }
+
+    static class FastScanner {
+        BufferedReader br;
+        StringTokenizer st;
+
+        FastScanner(InputStream is) {
+            br = new BufferedReader(new InputStreamReader(is));
+        }
+
+        String next() {
+            while (st == null || !st.hasMoreElements()) {
+                try {
+                    st = new StringTokenizer(br.readLine());
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+            return st.nextToken();
+        }
+
+        int nextInt() {
+            return Integer.parseInt(next());
+        }
+    }
+}`,
+
+  kotlin: `import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.util.StringTokenizer
+
+fun main() {
+    val br = BufferedReader(InputStreamReader(System.in))
+    var st = StringTokenizer(br.readLine())
+    val t = st.nextToken().toInt()
+
+    repeat(t) {
+        st = StringTokenizer(br.readLine())
+        val n = st.nextToken().toInt()
+        println(n)
+    }
+}
+`,
+
+  python: `import sys
+input = sys.stdin.readline
+
+t = int(input())
+for _ in range(t):
+    n = int(input())
+    print(n)
+`,
+
+  pypy: `import sys
+input = sys.stdin.readline
+
+t = int(input())
+for _ in range(t):
+    n = int(input())
+    print(n)
+`,
+
+  javascript: `const fs = require('fs');
+
+const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/).map(Number);
+let idx = 0;
+
+let t = input[idx++];
+while (t--) {
+    let n = input[idx++];
+    console.log(n);
+}
+`,
+
+  typescript: `import * as fs from 'fs';
+
+const input = fs.readFileSync(0, 'utf-8').trim().split(/\\s+/).map(Number);
+let idx = 0;
+
+let t = input[idx++];
+while (t--) {
+    let n = input[idx++];
+    console.log(n);
+}
+`,
+
+  rust: `use std::io::{self, Read};
+
+fn main() {
+    let mut input = String::new();
+    io::stdin().read_to_string(&mut input).unwrap();
+    let mut iter = input.split_whitespace();
+
+    let t: i32 = iter.next().unwrap().parse().unwrap();
+    for _ in 0..t {
+        let n: i32 = iter.next().unwrap().parse().unwrap();
+        println!("{}", n);
+    }
+}
+`,
+
+  go: `package main
+
+import (
+    "bufio"
+    "fmt"
+    "os"
+)
+
+func main() {
+    in := bufio.NewReader(os.Stdin)
+    var t int
+    fmt.Fscan(in, &t)
+
+    for t > 0 {
+        var n int
+        fmt.Fscan(in, &n)
+        fmt.Println(n)
+        t--
+    }
+}
+`,
+
+  csharp: `using System;
+using System.IO;
+
+class Program {
+    static void Main() {
+        var input = Console.ReadLine();
+        int t = int.Parse(input);
+        while (t-- > 0) {
+            int n = int.Parse(Console.ReadLine());
+            Console.WriteLine(n);
+        }
+    }
+}
+`,
+
+  ruby: `t = gets.to_i
+t.times do
+  n = gets.to_i
+  puts n
+end
+`,
+
+  php: `<?php
+$t = intval(fgets(STDIN));
+while ($t--) {
+    $n = intval(fgets(STDIN));
+    echo $n . PHP_EOL;
+}
+`,
+
+  swift: `import Foundation
+
+if let t = Int(readLine()!) {
+    for _ in 0..<t {
+        let n = Int(readLine()!)!
+        print(n)
+    }
+}
+`,
+
+  scala: `import scala.io.StdIn._
+
+object Main {
+  def main(args: Array[String]): Unit = {
+    val t = readInt()
+    for (_ <- 0 until t) {
+      val n = readInt()
+      println(n)
+    }
+  }
+}
+`,
+
+  haskell: `main = do
+    t <- readLn :: IO Int
+    sequence_ [do
+        n <- readLn :: IO Int
+        print n
+        | _ <- [1..t]]
+`,
+
+  ocaml: `let t = read_int () in
+for _ = 1 to t do
+  let n = read_int () in
+  print_int n;
+  print_newline ();
+done;
+`,
+
+  d: `import std.stdio;
+import std.conv;
+
+void main() {
+    int t;
+    readf("%d", &t);
+    while (t--) {
+        int n;
+        readf("%d", &n);
+        writeln(n);
+    }
+}
+`,
+
+  lua: `t = tonumber(io.read())
+for i = 1, t do
+    n = tonumber(io.read())
+    print(n)
+end
+`,
 };
 
 export const DEFAULT_SITES: SiteEntry[] = [
