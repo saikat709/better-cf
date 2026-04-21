@@ -8,7 +8,7 @@ export default defineConfig({
   manifest: {
     name: 'BetterCF',
     description: 'Make codeforces better again.',
-    host_permissions: ['https://emkc.org/*'],
+    host_permissions: ['https://emkc.org/*', "https://wandbox.org/*"],
     browser_specific_settings: {
       gecko: {
         data_collection_permissions: {

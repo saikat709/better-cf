@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type Keyboard
 import type { editor } from 'monaco-editor';
 import { Code, FilePlus2, Maximize2, Minimize2, Play, Redo2, Undo2, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { runPiston } from '../../lib/piston';
+import { runWandbox } from '../../lib/wandbox';
 import MonacoPane from './MonacoPane';
 import { makeFile, ensureExtension } from './files';
 import { loadState, saveState } from './storage';
@@ -155,7 +155,7 @@ function ContentApp() {
     }
 
     try {
-      const result = await runPiston(activeFile.language, activeFile.content, input);
+      const result = await runWandbox(activeFile.language, activeFile.content, input);
       const outputChunks: string[] = [];
       if (result.compile) {
         const compileOutput = [result.compile.stdout, result.compile.stderr].filter(Boolean).join('\n');
@@ -173,6 +173,9 @@ function ContentApp() {
       }
       if (result.exitCode && result.exitCode !== 0) {
         outputChunks.push(`Run exit code: ${result.exitCode}`);
+      }
+      if (result.signal) {
+        outputChunks.push(`Signal: ${result.signal}`);
       }
       setOutput(outputChunks.join('\n'));
     } catch (error) {
