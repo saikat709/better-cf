@@ -10,6 +10,9 @@ import {
 import type { editor } from 'monaco-editor';
 import {
   Check,
+  ChevronDown,
+  ChevronUp,
+  ClipboardPaste,
   Code,
   Copy,
   FilePlus2,
@@ -56,7 +59,7 @@ import {
 import { SIDEBAR_THEMES, SIDEBAR_THEME_LIST } from '../shared/themes/presets';
 import type { SidebarThemeId } from '../shared/themes/types';
 
-type IoTab = 'custom' | 'samples';
+type IoTab = 'input' | 'output' | 'samples';
 
 const STATUS_BADGE_STYLES: Record<ExecutionStatus | 'running' | 'idle' | 'error', { label: string; bg: string; color: string }> = {
   idle: { label: 'Ready', bg: 'rgba(148, 163, 184, 0.14)', color: 'var(--bcp-sb-text-muted)' },
@@ -86,7 +89,9 @@ function ContentApp() {
   const [isAllowed, setIsAllowed] = useState(() => isSiteAllowed(window.location.hostname, DEFAULT_SETTINGS.sites));
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedOutput, setCopiedOutput] = useState(false);
-  const [ioTab, setIoTab] = useState<IoTab>('custom');
+  const [ioTab, setIoTab] = useState<IoTab>('input');
+  const [ioCollapsed, setIoCollapsed] = useState(false);
+  const [execRunner, setExecRunner] = useState<'wandbox' | 'piston' | null>(null);
   const [samples, setSamples] = useState<SampleCase[]>([]);
   const [sampleOutcomes, setSampleOutcomes] = useState<SampleRunOutcome[]>([]);
   const [runningSamples, setRunningSamples] = useState(false);
@@ -246,8 +251,10 @@ function ContentApp() {
     setIsRunning(true);
     setExecStatus('running');
     setExecDurationMs(null);
+    setExecRunner(null);
     setOutput('Running...');
-    setIoTab('custom');
+    setIoCollapsed(false);
+    setIoTab('output');
 
     try {
       const result = await executeCode(activeFile.language, activeFile.content, input, {
@@ -255,6 +262,7 @@ function ContentApp() {
       });
       setExecStatus(result.status);
       setExecDurationMs(result.durationMs);
+      setExecRunner(result.runner);
       setOutput(formatExecutionOutput(result));
     } catch (error) {
       setExecStatus('error');
@@ -276,6 +284,7 @@ function ContentApp() {
     setRunningSamples(true);
     setIsRunning(true);
     setSampleOutcomes([]);
+    setIoCollapsed(false);
     setIoTab('samples');
 
     const outcomes: SampleRunOutcome[] = [];
@@ -902,9 +911,12 @@ function ContentApp() {
             {/* Input / Output & Samples Panel */}
             <div
               className="flex flex-col overflow-hidden px-4 pb-2.5 pt-1.5"
-              style={{ height: `${ioHeight}px`, backgroundColor: 'var(--bcp-sb-surface)' }}
+              style={{
+                height: ioCollapsed ? 'auto' : `${ioHeight}px`,
+                backgroundColor: 'var(--bcp-sb-surface)',
+              }}
             >
-              <div className="mb-2 flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2 pb-2">
                 <div
                   className="inline-flex items-center gap-1 rounded-lg border p-0.5"
                   style={{
@@ -914,26 +926,50 @@ function ContentApp() {
                 >
                   <button
                     type="button"
-                    onClick={() => setIoTab('custom')}
+                    onClick={() => {
+                      setIoCollapsed(false);
+                      setIoTab('input');
+                    }}
                     className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold transition-colors"
                     style={{
-                      backgroundColor: ioTab === 'custom' ? 'var(--bcp-sb-accent-soft)' : 'transparent',
-                      color: ioTab === 'custom' ? 'var(--bcp-sb-accent-text)' : 'var(--bcp-sb-text-muted)',
+                      backgroundColor: !ioCollapsed && ioTab === 'input' ? 'var(--bcp-sb-accent-soft)' : 'transparent',
+                      color: !ioCollapsed && ioTab === 'input' ? 'var(--bcp-sb-accent-text)' : 'var(--bcp-sb-text-muted)',
+                    }}
+                  >
+                    Stdin
+                    {input.trim().length > 0 && (
+                      <span
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ backgroundColor: 'var(--bcp-sb-accent)' }}
+                      />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIoCollapsed(false);
+                      setIoTab('output');
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold transition-colors"
+                    style={{
+                      backgroundColor: !ioCollapsed && ioTab === 'output' ? 'var(--bcp-sb-accent-soft)' : 'transparent',
+                      color: !ioCollapsed && ioTab === 'output' ? 'var(--bcp-sb-accent-text)' : 'var(--bcp-sb-text-muted)',
                     }}
                   >
                     <Terminal size={12} />
-                    Console I/O
+                    Output
                   </button>
                   <button
                     type="button"
                     onClick={() => {
                       refreshSamples();
+                      setIoCollapsed(false);
                       setIoTab('samples');
                     }}
                     className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-semibold transition-colors"
                     style={{
-                      backgroundColor: ioTab === 'samples' ? 'var(--bcp-sb-accent-soft)' : 'transparent',
-                      color: ioTab === 'samples' ? 'var(--bcp-sb-accent-text)' : 'var(--bcp-sb-text-muted)',
+                      backgroundColor: !ioCollapsed && ioTab === 'samples' ? 'var(--bcp-sb-accent-soft)' : 'transparent',
+                      color: !ioCollapsed && ioTab === 'samples' ? 'var(--bcp-sb-accent-text)' : 'var(--bcp-sb-text-muted)',
                     }}
                   >
                     <FlaskConical size={12} />
@@ -941,42 +977,19 @@ function ContentApp() {
                   </button>
                 </div>
 
-                {ioTab === 'custom' ? (
-                  <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5">
+                  {ioTab === 'output' && (
                     <span
                       className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
                       style={{ backgroundColor: badge.bg, color: badge.color }}
                     >
                       {badge.label}
                       {execDurationMs !== null ? ` • ${execDurationMs}ms` : ''}
+                      {execRunner ? ` • ${execRunner}` : ''}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => void copyOutput()}
-                      className="rounded-md p-1 opacity-75 hover:opacity-100"
-                      style={{ color: copiedOutput ? '#4ade80' : 'var(--bcp-sb-text-muted)' }}
-                      title="Copy output"
-                      aria-label="Copy output"
-                    >
-                      {copiedOutput ? <Check size={13} /> : <Copy size={13} />}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOutput('No output yet');
-                        setExecStatus('idle');
-                        setExecDurationMs(null);
-                      }}
-                      className="rounded-md p-1 opacity-75 hover:opacity-100"
-                      style={{ color: 'var(--bcp-sb-text-muted)' }}
-                      title="Clear output"
-                      aria-label="Clear output"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
-                ) : (
-                  sampleOutcomes.length > 0 && (
+                  )}
+
+                  {ioTab === 'samples' && sampleOutcomes.length > 0 && (
                     <span
                       className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
                       style={{
@@ -987,53 +1000,138 @@ function ContentApp() {
                     >
                       {passedCount}/{sampleOutcomes.length} Passed
                     </span>
-                  )
-                )}
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setIoCollapsed((value) => !value)}
+                    className="rounded-md p-1 opacity-75 hover:opacity-100"
+                    style={{ color: 'var(--bcp-sb-text-muted)' }}
+                    title={ioCollapsed ? 'Expand I/O panel' : 'Collapse I/O panel'}
+                    aria-label={ioCollapsed ? 'Expand I/O panel' : 'Collapse I/O panel'}
+                  >
+                    {ioCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </button>
+                </div>
               </div>
 
-              {ioTab === 'custom' ? (
-                <div className="grid min-h-0 flex-1 grid-cols-2 gap-3">
-                  <div className="flex min-h-0 flex-col">
-                    <label
-                      htmlFor="better-cp-input"
-                      className="mb-1 text-[11px] font-semibold uppercase tracking-wider"
-                      style={{ color: 'var(--bcp-sb-text-muted)' }}
-                    >
-                      Stdin
-                    </label>
-                    <textarea
-                      id="better-cp-input"
-                      value={input}
-                      onChange={(event) => setInput(event.target.value)}
-                      className="min-h-0 flex-1 resize-none rounded-lg border p-2.5 font-mono text-xs outline-none"
-                      style={{
-                        backgroundColor: 'var(--bcp-sb-bg)',
-                        borderColor: 'var(--bcp-sb-border)',
-                        color: 'var(--bcp-sb-text)',
-                      }}
-                      placeholder="Enter program stdin..."
-                    />
+              {!ioCollapsed && ioTab === 'input' && (
+                <div className="flex min-h-0 flex-1 flex-col gap-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-1">
+                      {samples.map((sample) => (
+                        <button
+                          key={sample.index}
+                          type="button"
+                          onClick={() => setInput(sample.input)}
+                          className="rounded-md border px-2 py-0.5 text-[11px] font-medium transition-opacity hover:opacity-85"
+                          style={{
+                            borderColor: 'var(--bcp-sb-border)',
+                            backgroundColor: 'var(--bcp-sb-bg)',
+                            color: 'var(--bcp-sb-text-muted)',
+                          }}
+                        >
+                          Use Sample #{sample.index}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="ml-auto flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          void navigator.clipboard.readText().then((text) => setInput(text)).catch(() => {});
+                        }}
+                        className="inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium hover:opacity-85"
+                        style={{
+                          borderColor: 'var(--bcp-sb-border)',
+                          backgroundColor: 'var(--bcp-sb-bg)',
+                          color: 'var(--bcp-sb-text-muted)',
+                        }}
+                        title="Paste from clipboard"
+                      >
+                        <ClipboardPaste size={11} />
+                        Paste
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setInput('')}
+                        className="inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium hover:opacity-85"
+                        style={{
+                          borderColor: 'var(--bcp-sb-border)',
+                          backgroundColor: 'var(--bcp-sb-bg)',
+                          color: 'var(--bcp-sb-text-muted)',
+                        }}
+                        title="Clear stdin"
+                      >
+                        <Trash2 size={11} />
+                        Clear
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex min-h-0 flex-col">
-                    <span
-                      className="mb-1 text-[11px] font-semibold uppercase tracking-wider"
-                      style={{ color: 'var(--bcp-sb-text-muted)' }}
-                    >
-                      Output
-                    </span>
-                    <pre
-                      className="m-0 min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg border p-2.5 font-mono text-xs"
-                      style={{
-                        backgroundColor: 'var(--bcp-sb-bg)',
-                        borderColor: 'var(--bcp-sb-border)',
-                        color: 'var(--bcp-sb-text)',
-                      }}
-                    >
-                      {output}
-                    </pre>
-                  </div>
+                  <textarea
+                    id="better-cp-input"
+                    value={input}
+                    onChange={(event) => setInput(event.target.value)}
+                    className="min-h-0 flex-1 resize-none rounded-lg border p-2.5 font-mono text-xs outline-none"
+                    style={{
+                      backgroundColor: 'var(--bcp-sb-bg)',
+                      borderColor: 'var(--bcp-sb-border)',
+                      color: 'var(--bcp-sb-text)',
+                    }}
+                    placeholder="Enter custom test input (stdin)..."
+                  />
                 </div>
-              ) : (
+              )}
+
+              {!ioCollapsed && ioTab === 'output' && (
+                <div className="flex min-h-0 flex-1 flex-col gap-1.5">
+                  <div className="flex items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => void copyOutput()}
+                      className="inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium hover:opacity-85"
+                      style={{
+                        borderColor: 'var(--bcp-sb-border)',
+                        backgroundColor: 'var(--bcp-sb-bg)',
+                        color: copiedOutput ? '#4ade80' : 'var(--bcp-sb-text-muted)',
+                      }}
+                    >
+                      {copiedOutput ? <Check size={11} /> : <Copy size={11} />}
+                      {copiedOutput ? 'Copied' : 'Copy'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOutput('No output yet');
+                        setExecStatus('idle');
+                        setExecDurationMs(null);
+                        setExecRunner(null);
+                      }}
+                      className="inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium hover:opacity-85"
+                      style={{
+                        borderColor: 'var(--bcp-sb-border)',
+                        backgroundColor: 'var(--bcp-sb-bg)',
+                        color: 'var(--bcp-sb-text-muted)',
+                      }}
+                    >
+                      <Trash2 size={11} />
+                      Clear
+                    </button>
+                  </div>
+                  <pre
+                    className="m-0 min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words rounded-lg border p-2.5 font-mono text-xs"
+                    style={{
+                      backgroundColor: 'var(--bcp-sb-bg)',
+                      borderColor: 'var(--bcp-sb-border)',
+                      color: 'var(--bcp-sb-text)',
+                    }}
+                  >
+                    {output}
+                  </pre>
+                </div>
+              )}
+
+              {!ioCollapsed && ioTab === 'samples' && (
                 <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                   {samples.length === 0 ? (
                     <div
@@ -1079,7 +1177,7 @@ function ContentApp() {
                               type="button"
                               onClick={() => {
                                 setInput(sample.input);
-                                setIoTab('custom');
+                                setIoTab('input');
                               }}
                               className="rounded-md border px-2 py-0.5 text-[11px] font-medium transition-opacity hover:opacity-85"
                               style={{
