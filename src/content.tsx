@@ -61,20 +61,18 @@ export default defineContentScript({
         box-sizing: border-box;
       }
       #better-cp-ui-root {
-        font-size: 15px !important;
-        line-height: 1.4 !important;
-        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
+        font-size: 14px;
+        line-height: 1.4;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       }
       #better-cp-ui-root button,
       #better-cp-ui-root input,
       #better-cp-ui-root select,
       #better-cp-ui-root textarea,
       #better-cp-ui-root label {
-        font-size: 14px !important;
-        font-family: inherit !important;
-        color: inherit !important;
+        font-family: inherit;
       }
-      #better-cp-ui-root .bcp-title { font-size: 16px !important; }
+      #better-cp-ui-root .bcp-title { font-size: 15px; }
     `;
     const contentStylesheet = document.createElement('style');
     contentStylesheet.textContent = contentCssText;
