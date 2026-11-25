@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { executeCode, formatExecutionOutput, type ExecutionStatus } from '../../lib/runner';
+import logoUrl from '../../public/icon/48.png?inline';
 import MonacoPane from './MonacoPane';
 import { makeFile, ensureExtension } from './files';
 import { loadState, saveState } from './storage';

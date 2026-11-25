@@ -132,10 +132,17 @@ function App() {
   return (
     <div className="popup-shell">
       <div className="popup-header">
-        <div>
-          <p className="eyebrow">BetterCF</p>
-          <h1 className="title">Theme Studio</h1>
-          <p className="subtitle">Switch Codeforces &amp; sidebar themes live.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img
+            src="/icon/48.png"
+            alt="BetterCF"
+            style={{ width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0 }}
+          />
+          <div>
+            <p className="eyebrow">BetterCF</p>
+            <h1 className="title">Theme Studio</h1>
+            <p className="subtitle">Switch Codeforces &amp; sidebar themes live.</p>
+          </div>
         </div>
         <button
           type="button"
