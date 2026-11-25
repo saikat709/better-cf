@@ -140,7 +140,12 @@ const mergeOutput = (primary: string, secondary: string): string => {
   return `${primary}\n${secondary}`;
 };
 
-export const runWandbox = async (language: Language, code: string, stdin: string): Promise<WandboxRunResult> => {
+export const runWandbox = async (
+  language: Language,
+  code: string,
+  stdin: string,
+  signal?: AbortSignal,
+): Promise<WandboxRunResult> => {
   const compilers = await loadCompilers();
   const compiler = compilers.get(language);
   if (!compiler) {
@@ -150,6 +155,7 @@ export const runWandbox = async (language: Language, code: string, stdin: string
   const response = await fetch(COMPILE_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal,
     body: JSON.stringify({
       code,
       compiler: compiler.name,

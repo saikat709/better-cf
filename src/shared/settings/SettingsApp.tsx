@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, Plus, RotateCcw, Save, Trash2 } from 'lucide-react';
+import { Check, ChevronRight, Plus, RotateCcw, Save, Trash2 } from 'lucide-react';
 import './SettingsApp.css';
 import {
   DEFAULT_SETTINGS,
@@ -12,6 +12,7 @@ import {
   type Settings,
   type SiteEntry,
 } from '../settings';
+import { SIDEBAR_THEME_LIST, WEBSITE_THEME_LIST } from '../themes/presets';
 import { Collapse, SettingsCard, SettingsHeader, SettingsModal, SettingsShell, SettingsTabs } from './SettingsComponents';
 
 const getId = () => (crypto.randomUUID ? crypto.randomUUID() : `site-${Date.now()}`);
@@ -29,6 +30,7 @@ const initTemplateDirty = (): Record<Language, boolean> =>
 const tabs = [
   { value: 'sites', label: 'Active sites' },
   { value: 'templates', label: 'Templates' },
+  { value: 'themes', label: 'Themes' },
 ] as const;
 
 type ActiveTab = (typeof tabs)[number]['value'];
@@ -270,6 +272,102 @@ function SettingsApp() {
             })}
           </div>
         </SettingsCard>
+      )}
+
+      {activeTab === 'themes' && (
+        <div className="themes-stack">
+          <SettingsCard>
+            <div className="section-head">
+              <div>
+                <div className="card-title">Codeforces Website Theme</div>
+                <p className="subtitle">
+                  Applies to codeforces.com and all Codeforces mirrors (codeforc.es, codeforces.ml, etc.).
+                </p>
+              </div>
+              <label className="checkbox-pill">
+                <input
+                  type="checkbox"
+                  checked={settings.dimImagesInDarkMode}
+                  onChange={(event) =>
+                    setSettings((prev) => ({ ...prev, dimImagesInDarkMode: event.target.checked }))
+                  }
+                />
+                <span>Dim bright images in dark mode</span>
+              </label>
+            </div>
+
+            <div className="theme-grid">
+              {WEBSITE_THEME_LIST.map((preset) => {
+                const selected = settings.websiteTheme === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className={`theme-card ${selected ? 'selected' : ''}`}
+                    onClick={() => setSettings((prev) => ({ ...prev, websiteTheme: preset.id }))}
+                  >
+                    <div className="theme-swatches">
+                      {preset.swatches.map((hex, idx) => (
+                        <span key={idx} className="swatch" style={{ backgroundColor: hex }} />
+                      ))}
+                    </div>
+                    <div className="theme-card-head">
+                      <span className="theme-name">{preset.name}</span>
+                      {selected && (
+                        <span className="theme-active-badge">
+                          <Check size={12} />
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="theme-desc">{preset.description}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </SettingsCard>
+
+          <SettingsCard>
+            <div className="section-head">
+              <div>
+                <div className="card-title">Sidebar &amp; Monaco Editor Theme</div>
+                <p className="subtitle">
+                  Styled independently from the Codeforces website theme.
+                </p>
+              </div>
+            </div>
+
+            <div className="theme-grid">
+              {SIDEBAR_THEME_LIST.map((preset) => {
+                const selected = settings.sidebarTheme === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className={`theme-card ${selected ? 'selected' : ''}`}
+                    onClick={() => setSettings((prev) => ({ ...prev, sidebarTheme: preset.id }))}
+                  >
+                    <div className="theme-swatches">
+                      {preset.swatches.map((hex, idx) => (
+                        <span key={idx} className="swatch" style={{ backgroundColor: hex }} />
+                      ))}
+                    </div>
+                    <div className="theme-card-head">
+                      <span className="theme-name">{preset.name}</span>
+                      {selected && (
+                        <span className="theme-active-badge">
+                          <Check size={12} />
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="theme-desc">{preset.description}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </SettingsCard>
+        </div>
       )}
 
       <SettingsModal

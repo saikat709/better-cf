@@ -39,13 +39,25 @@ type PistonRunResult = {
 const RUNTIMES_URL = 'https://emkc.org/api/v2/piston/runtimes';
 const EXECUTE_URL = 'https://emkc.org/api/v2/piston/execute';
 
-const TARGET_LANGUAGES: Record<Language, string> = {
+const TARGET_LANGUAGES: Partial<Record<Language, string>> = {
   c: 'c',
   cpp: 'cpp',
   java: 'java',
+  kotlin: 'kotlin',
   javascript: 'javascript',
   typescript: 'typescript',
   python: 'python',
+  rust: 'rust',
+  go: 'go',
+  csharp: 'csharp',
+  ruby: 'ruby',
+  php: 'php',
+  swift: 'swift',
+  scala: 'scala',
+  haskell: 'haskell',
+  ocaml: 'ocaml',
+  d: 'd',
+  lua: 'lua',
 };
 
 let runtimesPromise: Promise<Map<Language, ResolvedRuntime>> | null = null;
@@ -94,6 +106,7 @@ const loadRuntimes = async (): Promise<Map<Language, ResolvedRuntime>> => {
         const resolved = new Map<Language, ResolvedRuntime>();
         (Object.keys(TARGET_LANGUAGES) as Language[]).forEach((language) => {
           const target = TARGET_LANGUAGES[language];
+          if (!target) return;
           const runtime = selectLatestRuntime(runtimes, target);
           if (runtime) resolved.set(language, runtime);
         });
@@ -103,7 +116,12 @@ const loadRuntimes = async (): Promise<Map<Language, ResolvedRuntime>> => {
   return runtimesPromise;
 };
 
-export const runPiston = async (language: Language, code: string, stdin: string): Promise<PistonRunResult> => {
+export const runPiston = async (
+  language: Language,
+  code: string,
+  stdin: string,
+  signal?: AbortSignal,
+): Promise<PistonRunResult> => {
   const runtimes = await loadRuntimes();
   const runtime = runtimes.get(language);
   if (!runtime) {
@@ -113,6 +131,7 @@ export const runPiston = async (language: Language, code: string, stdin: string)
   const response = await fetch(EXECUTE_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    signal,
     body: JSON.stringify({
       language: runtime.language,
       version: runtime.version,

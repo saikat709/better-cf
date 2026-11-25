@@ -1,0 +1,282 @@
+/* BetterCF Codeforces Theme Engine */
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) {
+  background-color: var(--bcp-cf-bg) !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] {
+  color-scheme: dark;
+}
+
+html[data-bcp-cf-theme][data-bcp-cf-dark='false'] {
+  color-scheme: light;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) body {
+  background: var(--bcp-cf-bg) !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) ::selection {
+  background: var(--bcp-cf-selection) !important;
+}
+
+/* Header, Navigation, Footer */
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) #header,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) #footer,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .header-bell,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .lang-chooser {
+  background-color: transparent !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) #footer {
+  border-top-color: var(--bcp-cf-border) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .menu-box,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .second-level-menu,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .second-level-menu-list li.current,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .second-level-menu-list li:hover {
+  background-color: var(--bcp-cf-surface) !important;
+  border-color: var(--bcp-cf-border) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .menu-list li a,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .second-level-menu-list li a {
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .menu-list li.current a {
+  border-bottom-color: var(--bcp-cf-accent) !important;
+}
+
+/* Main Cards & Roundboxes */
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .roundbox,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .datatable,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .bottom-links,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .topic,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .comment-table,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .userbox,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .personal-sidebar,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .sidebar-menu {
+  background-color: var(--bcp-cf-surface) !important;
+  border-color: var(--bcp-cf-border) !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .roundbox .caption,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .roundbox .titled,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .datatable > div:first-child {
+  background-color: var(--bcp-cf-surface-alt) !important;
+  border-bottom-color: var(--bcp-cf-border) !important;
+  color: var(--bcp-cf-heading) !important;
+}
+
+/* Hide Codeforces decorative white corner PNGs that clash with dark surfaces */
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .roundbox-lt,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .roundbox-rt,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .roundbox-lb,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .roundbox-rb,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .ilt,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .irt,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .ilb,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .irb {
+  display: none !important;
+}
+
+/* Links & Typography */
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) a:not([class*='user-']) {
+  color: var(--bcp-cf-link) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) a:not([class*='user-']):hover {
+  color: var(--bcp-cf-link-hover) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) h1,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) h2,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) h3,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) h4,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .title,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .ttypography h1,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .ttypography h2,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .ttypography h3 {
+  color: var(--bcp-cf-heading) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .ttypography,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .problem-statement,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .problem-statement p,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .problem-statement li,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .problem-statement .header {
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .ttypography blockquote {
+  background-color: var(--bcp-cf-surface-alt) !important;
+  border-left-color: var(--bcp-cf-accent) !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .small,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .notice,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .info,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .property-title {
+  color: var(--bcp-cf-text-muted) !important;
+}
+
+/* Sample Tests, Code & Pre */
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .problem-statement .sample-test .input,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .problem-statement .sample-test .output {
+  border-color: var(--bcp-cf-border) !important;
+  background-color: var(--bcp-cf-code-bg) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .problem-statement .sample-test .title {
+  background-color: var(--bcp-cf-pre-header) !important;
+  border-bottom-color: var(--bcp-cf-border) !important;
+  color: var(--bcp-cf-heading) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) pre,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) code,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .ttypography pre,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .ttypography code {
+  background-color: var(--bcp-cf-code-bg) !important;
+  color: var(--bcp-cf-code-text) !important;
+  border-color: var(--bcp-cf-border) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .test-example-line-even {
+  background-color: var(--bcp-cf-sample-even) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .test-example-line-odd {
+  background-color: var(--bcp-cf-sample-odd) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .test-example-line:hover {
+  background-color: var(--bcp-cf-surface-hover) !important;
+}
+
+/* MathJax & KaTeX */
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .MathJax,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) mjx-container {
+  color: var(--bcp-cf-text) !important;
+}
+
+/* Tables (Standings, Problemset, Status, Submissions) */
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) table,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .datatable table,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .rtable {
+  background-color: var(--bcp-cf-surface) !important;
+  color: var(--bcp-cf-text) !important;
+  border-color: var(--bcp-cf-border) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .datatable th,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .rtable th,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) table.standings th {
+  background-color: var(--bcp-cf-surface-alt) !important;
+  color: var(--bcp-cf-heading) !important;
+  border-color: var(--bcp-cf-border) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .datatable td,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .rtable td,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) table.standings td {
+  border-color: var(--bcp-cf-border) !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .datatable tr.dark td,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .rtable tr.dark td,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .datatable tbody tr:nth-child(even) td {
+  background-color: var(--bcp-cf-table-stripe) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .datatable tbody tr:hover td {
+  background-color: var(--bcp-cf-surface-hover) !important;
+}
+
+/* Preserve Solved/Attempted cell tints with dark-friendly opacity */
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .datatable td.accepted-problem {
+  background-color: rgba(34, 197, 94, 0.18) !important;
+}
+
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .datatable td.rejected-problem {
+  background-color: rgba(239, 68, 68, 0.18) !important;
+}
+
+/* Legendary GM first-letter contrast fix on dark themes */
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .user-legendary::first-letter {
+  color: #ffffff !important;
+}
+
+/* Tags & Badges */
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) .tag-box {
+  background-color: var(--bcp-cf-surface-alt) !important;
+  border-color: var(--bcp-cf-border) !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+/* Inputs, Selects, Buttons */
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) input[type='text'],
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) input[type='password'],
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) input[type='search'],
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) input[type='number'],
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) select,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) textarea {
+  background-color: var(--bcp-cf-input-bg) !important;
+  border-color: var(--bcp-cf-input-border) !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) input[type='submit'],
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) input[type='button'],
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) button:not(.bcp-ignore) {
+  background-color: var(--bcp-cf-surface-alt) !important;
+  border-color: var(--bcp-cf-border) !important;
+  color: var(--bcp-cf-text) !important;
+}
+
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) input[type='submit']:hover,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) input[type='button']:hover,
+html[data-bcp-cf-theme]:not([data-bcp-cf-theme='default']) button:not(.bcp-ignore):hover {
+  background-color: var(--bcp-cf-surface-hover) !important;
+}
+
+/* Highcharts Rating Graph */
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .highcharts-background {
+  fill: var(--bcp-cf-surface) !important;
+}
+
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .highcharts-title,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .highcharts-axis-labels text,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] .highcharts-legend-item text {
+  fill: var(--bcp-cf-text) !important;
+}
+
+/* Dim bright images/diagrams in dark themes */
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'][data-bcp-cf-dim-images='true'] .problem-statement img,
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'][data-bcp-cf-dim-images='true'] .ttypography img {
+  filter: brightness(0.86) contrast(1.06);
+  border-radius: 4px;
+}
+
+/* Scrollbars */
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] ::-webkit-scrollbar-track {
+  background: var(--bcp-cf-bg);
+}
+
+html[data-bcp-cf-theme][data-bcp-cf-dark='true'] ::-webkit-scrollbar-thumb {
+  background: var(--bcp-cf-border);
+  border-radius: 999px;
+}

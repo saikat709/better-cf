@@ -1,20 +1,23 @@
 import { useEffect, useRef } from 'react';
 import type { editor } from 'monaco-editor';
 import type { Language } from '../shared/settings';
+import { registerCustomMonacoThemes } from './monacoThemes';
 
 type MonacoPaneProps = {
   value: string;
   language: Language;
+  theme: string;
   onChange: (value: string) => void;
   onMount: (instance: editor.IStandaloneCodeEditor) => void;
 };
 
-function MonacoPane({ value, language, onChange, onMount }: MonacoPaneProps) {
+function MonacoPane({ value, language, theme, onChange, onMount }: MonacoPaneProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<Awaited<typeof import('monaco-editor/esm/vs/editor/editor.api.js')> | null>(null);
   const onChangeRef = useRef(onChange);
   const onMountRef = useRef(onMount);
+  const themeRef = useRef(theme);
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -23,6 +26,13 @@ function MonacoPane({ value, language, onChange, onMount }: MonacoPaneProps) {
   useEffect(() => {
     onMountRef.current = onMount;
   }, [onMount]);
+
+  useEffect(() => {
+    themeRef.current = theme;
+    if (monacoRef.current) {
+      monacoRef.current.editor.setTheme(theme);
+    }
+  }, [theme]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -35,11 +45,12 @@ function MonacoPane({ value, language, onChange, onMount }: MonacoPaneProps) {
       const monaco = await import('monaco-editor/esm/vs/editor/editor.api.js');
       if (disposed) return;
       monacoRef.current = monaco;
+      registerCustomMonacoThemes(monaco);
 
       const instance = monaco.editor.create(container, {
         value,
         language,
-        theme: 'vs-dark',
+        theme: themeRef.current,
         minimap: { enabled: false },
         lineNumbers: 'on',
         fontSize: 15,
@@ -76,7 +87,13 @@ function MonacoPane({ value, language, onChange, onMount }: MonacoPaneProps) {
     if (model) monaco.editor.setModelLanguage(model, language);
   }, [language]);
 
-  return <div ref={containerRef} className="h-full w-full rounded-xl overflow-hidden border border-slate-700" />;
+  return (
+    <div
+      ref={containerRef}
+      className="h-full w-full overflow-hidden rounded-lg border"
+      style={{ borderColor: 'var(--bcp-sb-border)' }}
+    />
+  );
 }
 
 export default MonacoPane;

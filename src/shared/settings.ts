@@ -1,3 +1,5 @@
+import type { SidebarThemeId, WebsiteThemeId } from './themes/types';
+
 export type Language =
   | 'c'
   | 'cpp'
@@ -30,6 +32,10 @@ export type Settings = {
   defaultLanguage: Language;
   templates: Record<Language, string>;
   sites: SiteEntry[];
+  websiteTheme: WebsiteThemeId;
+  sidebarTheme: SidebarThemeId;
+  dimImagesInDarkMode: boolean;
+  sidebarWidth: number;
 };
 
 export const LANGUAGE_META: Record<Language, { label: string; ext: string }> = {
@@ -72,10 +78,10 @@ int main() {
   cpp: `#include <bits/stdc++.h>
 using namespace std;
 
-#define fast ios::sync_with_stdio(false); cin.tie(NULL);
+#define FAST ios::sync_with_stdio(false); cin.tie(NULL);
 
 int main() {
-    fast;
+    FAST;
     int t;
     cin >> t;
     while (t--) {
@@ -317,6 +323,7 @@ end
 
 export const DEFAULT_SITES: SiteEntry[] = [
   { id: 'cf', host: 'codeforces.com', enabled: true },
+  { id: 'cf-es', host: 'codeforc.es', enabled: true },
   { id: 'vjudge', host: 'vjudge.net', enabled: true },
   { id: 'atcoder', host: 'atcoder.jp', enabled: true },
   { id: 'codechef', host: 'codechef.com', enabled: true },
@@ -331,6 +338,10 @@ export const DEFAULT_SETTINGS: Settings = {
   defaultLanguage: 'cpp',
   templates: { ...DEFAULT_SNIPPETS },
   sites: DEFAULT_SITES,
+  websiteTheme: 'default',
+  sidebarTheme: 'dark-slate',
+  dimImagesInDarkMode: true,
+  sidebarWidth: 560,
 };
 
 const SETTINGS_KEY = 'better-cp:settings';
