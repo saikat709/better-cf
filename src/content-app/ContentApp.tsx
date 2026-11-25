@@ -525,7 +525,7 @@ function ContentApp() {
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.96 }}
         >
-          <Code size={20} />
+          <img src={logoUrl} alt="BetterCF" style={{ width: '24px', height: '24px', borderRadius: '6px', display: 'block' }} />
         </motion.div>
       )}
 
@@ -565,17 +565,12 @@ function ContentApp() {
               className="flex items-center gap-2 border-b px-3 py-2"
               style={{ borderColor: 'var(--bcp-sb-border)', backgroundColor: 'var(--bcp-sb-surface)', fontSize: '13px' }}
             >
-              <div
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border"
-                style={{
-                  backgroundColor: 'var(--bcp-sb-accent-soft)',
-                  borderColor: 'var(--bcp-sb-accent)',
-                  color: 'var(--bcp-sb-accent-text)',
-                }}
+              <img
+                src={logoUrl}
+                alt="BetterCF"
+                style={{ width: '26px', height: '26px', borderRadius: '6px', flexShrink: 0 }}
                 title="BetterCF"
-              >
-                <Code size={15} />
-              </div>
+              />
 
               {/* Scrollable File Tabs right in the header */}
               <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
