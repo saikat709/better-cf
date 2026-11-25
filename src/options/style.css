@@ -1,7 +1,8 @@
 :root {
-  font-family: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
-  color: #0f172a;
-  background: #f1f5f9;
+  font-family: Inter, "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  color: #f1f5f9;
+  background: #090d16;
+  color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -19,9 +20,10 @@ body {
 }
 
 body {
-  background: linear-gradient(160deg, rgba(14, 116, 144, 0.08), transparent 40%),
-    radial-gradient(circle at 10% 10%, rgba(249, 115, 22, 0.08), transparent 45%),
-    #f8fafc;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(99, 102, 241, 0.16), transparent 42%),
+    radial-gradient(circle at 12% 14%, rgba(56, 189, 248, 0.1), transparent 45%),
+    #090d16;
 }
 
 #root {
